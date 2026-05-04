@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source Archive</title>
+    
+    <!-- Professional Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --background-color: #0a0a0a;
+            --text-color: #e0e0e0;
+            --button-bg: #222222;
+            --button-hover-bg: #333333;
+            --button-border: #444444;
+            --card-bg: #111111;
+            --accent-color: #4a90e2;
+            --accent-hover: #357abd;
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: 'Consolas', 'Menlo', 'Courier New', monospace;
+            
+            --status-success: #22c55e;
+            --status-error: #ef4444;
+            --status-pending: #4a90e2;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: var(--font-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        /* Header */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--button-border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo svg {
+            width: 32px;
+            height: 32px;
+            fill: var(--accent-color);
+        }
+
+        .header-section h1 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        /* Input Group */
+        .input-group {
+            position: relative;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--button-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .input-group:focus-within {
+            border-color: var(--accent-color);
+            background: rgba(74, 144, 226, 0.04);
+            box-shadow: 0 0 0 1px var(--accent-color);
+        }
+
+        .url-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 0.95rem;
+            padding: 6px 0;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        /* Generic Button Styles */
+        .btn {
+            background-color: var(--button-bg);
+            color: var(--text-color);
+            border: 1px solid var(--button-border);
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-main);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn:hover { background-color: var(--button-hover-bg); border-color: #666; }
+        .btn:active { transform: scale(0.98); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        
+        .btn-primary { background-color: var(--accent-color); border-color: var(--accent-color); color: white; font-weight: 600; }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+
+        .btn-sm { padding: 4px 10px; font-size: 0.75rem; }
+
+        /* History Cards */
+        #history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .source-card {
+            background: var(--card-bg);
+            border: 1px solid var(--button-border);
+            border-radius: 12px;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+            position: relative;
+        }
+
+        .source-card:hover { border-color: #555; }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        /* Card Title - Keeps natural wrapping */
+        .editable-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 6px 0;
+            cursor: text;
+            display: block;
+            max-width: 100%;
+            overflow-wrap: anywhere;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            line-height: 1.4;
+        }
+
+        .editable-title:focus { 
+            background: #222; 
+            outline: 1px solid var(--accent-color); 
+        }
+
+        .card-meta {
+            font-size: 0.8rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-meta img { width: 14px; height: 14px; border-radius: 2px; background: #333; }
+
+        .status-badge {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        .status-archiving { color: var(--accent-color); background: rgba(74, 144, 226, 0.1); }
+        .status-success { color: var(--status-success); background: rgba(34, 197, 94, 0.1); }
+        .status-error { color: var(--status-error); background: rgba(239, 68, 68, 0.1); }
+
+        /* Copy Box Layout */
+        .copy-boxes-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .copy-box {
+            background: #080808;
+            border: 1px solid #1a1a1a;
+            border-radius: 12px;
+            padding: 16px 48px 16px 16px;
+            position: relative;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            transition: border-color 0.2s;
+        }
+
+        .copy-box:hover {
+            border-color: #333;
+        }
+
+        .copy-box-text {
+            font-family: var(--font-main);
+            font-size: 0.9rem;
+            color: #888;
+            line-height: 1.6;
+            user-select: text;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .copy-row {
+            display: flex;
+            align-items: baseline;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .copy-row b {
+            color: #555;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            margin-right: 12px;
+            flex-shrink: 0;
+            min-width: 80px;
+        }
+
+        /* Link Truncation for clean look */
+        .link-preview {
+            color: var(--accent-color);
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            vertical-align: middle;
+            max-width: 100%;
+        }
+
+        .link-preview:hover {
+            color: var(--accent-hover);
+        }
+
+        .copy-box-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 12px;
+            background: transparent;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 8px;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-box-btn:hover:not(:disabled) {
+            color: var(--accent-color);
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+        }
+
+        .copy-box-btn:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 10px;
+            height: 10px;
+            border: 2px solid rgba(74, 144, 226, 0.3);
+            border-top-color: var(--accent-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #fff;
+            color: #000;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            z-index: 1000;
+        }
+
+        #toast.visible { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        .hidden { display: none !important; }
+        
+        @media (max-width: 600px) {
+            .header-section { flex-direction: column; gap: 16px; align-items: flex-start; }
+            .copy-box { padding-right: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header-section">
+            <div class="brand">
+                <div class="logo">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="25" y="45" width="10" height="40" rx="2" />
+                        <rect x="45" y="45" width="10" height="40" rx="2" />
+                        <rect x="65" y="45" width="10" height="40" rx="2" />
+                        <path d="M20 40 L50 15 L80 40 Z" />
+                        <rect x="15" y="85" width="70" height="5" rx="1" />
+                    </svg>
+                </div>
+                <h1>Source Archive</h1>
+            </div>
+            <div class="header-controls">
+                <button class="btn btn-sm" onclick="app.exportData()">
+                    <i class="fa-solid fa-download"></i> Export
+                </button>
+                <label class="btn btn-sm cursor-pointer" style="margin-left: 8px;">
+                    <i class="fa-solid fa-upload"></i> Import
+                    <input type="file" id="import-input" class="hidden" accept=".json">
+                </label>
+            </div>
+        </header>
+
+        <!-- Compact Input -->
+        <div class="input-group">
+            <input 
+                type="text" 
+                id="url-input" 
+                class="url-input" 
+                placeholder="Paste URL to archive..." 
+                autocomplete="off"
+            >
+            <button class="btn btn-primary btn-sm" onclick="app.addFromInput()">
+                Archive
+            </button>
+        </div>
+
+        <div class="list-header" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
+            <span id="stats-text" style="color: #444; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;">0 sources secured</span>
+            <button class="btn btn-sm" style="border: none; background: transparent; color: var(--status-error); opacity: 0.6;" onclick="app.clearHistory()">
+                Clear All
+            </button>
+        </div>
+
+        <div id="history-list">
+            <!-- Items Injected -->
+        </div>
+
+        <div id="empty-state" class="py-20 text-center" style="margin-top: 40px; opacity: 0.15;">
+            <i class="fa-solid fa-box-archive" style="font-size: 2.5rem; margin-bottom: 16px; display: block;"></i>
+            <p style="font-size: 0.9rem;">The archive is empty</p>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast">Copied to clipboard</div>
+
+    <script>
+        class SourceArchive {
+            constructor() {
+                this.history = JSON.parse(localStorage.getItem('source_archive_data') || '[]');
+                this.init();
+            }
+
+            init() {
+                this.render();
+                const input = document.getElementById('url-input');
+                input.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.addFromInput(); });
+                input.addEventListener('paste', () => setTimeout(() => this.addFromInput(), 50));
+                document.getElementById('import-input').addEventListener('change', (e) => this.importData(e));
+
+                this.history.forEach(item => {
+                    if (item.status === 'archiving') this.processArchive(item.id);
+                });
+            }
+
+            save() {
+                localStorage.setItem('source_archive_data', JSON.stringify(this.history));
+                this.render();
+            }
+
+            /**
+             * Helper to clean URLs for display as fallback titles
+             * Removes protocol and www prefix
+             */
+            formatUrlAsTitle(url) {
+                return url.replace(/^(https?:\/\/)?(www\.)?/, '');
+            }
+
+            async addFromInput() {
+                const input = document.getElementById('url-input');
+                let url = input.value.trim();
+                if (!url) return;
+                if (!url.startsWith('http')) url = 'https://' + url;
+
+                try { new URL(url); } catch (e) { this.notify("Invalid URL"); return; }
+                if (this.history.find(i => i.url === url)) { this.notify("Already archived"); input.value = ''; return; }
+
+                const newItem = {
+                    id: Date.now().toString(),
+                    url: url,
+                    domain: new URL(url).hostname,
+                    title: this.formatUrlAsTitle(url), // Initial clean URL fallback
+                    status: 'archiving',
+                    archiveUrl: null,
+                    timestamp: new Date().toISOString()
+                };
+
+                this.history.unshift(newItem);
+                input.value = '';
+                this.save();
+                this.processArchive(newItem.id);
+            }
+
+            async processArchive(id) {
+                const item = this.history.find(i => i.id === id);
+                if (!item) return;
+
+                const getTitleFromHTML = (html) => {
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    return doc.querySelector('title')?.innerText || 
+                           doc.querySelector('meta[property="og:title"]')?.content || 
+                           doc.querySelector('meta[name="twitter:title"]')?.content ||
+                           doc.querySelector('h1')?.innerText;
+                };
+
+                // Robust Title Scraping Logic
+                let scrapedTitle = null;
+
+                try {
+                    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(item.url)}`;
+                    const res = await fetch(proxy);
+                    const data = await res.json();
+                    if (data && data.contents) {
+                        scrapedTitle = getTitleFromHTML(data.contents);
+                    }
+                } catch (err) { 
+                    console.warn("AllOrigins failed, trying fallback..."); 
+                }
+
+                if (!scrapedTitle) {
+                    try {
+                        const fallbackProxy = `https://cors.x2u.in/${item.url}`;
+                        const res = await fetch(fallbackProxy);
+                        const html = await res.text();
+                        if (html) scrapedTitle = getTitleFromHTML(html);
+                    } catch (err) {
+                        console.warn("Fallback proxy failed:", err);
+                    }
+                }
+
+                if (scrapedTitle && scrapedTitle.trim()) {
+                    item.title = scrapedTitle.trim();
+                    this.save(); 
+                }
+
+                // Archive Logic
+                const waybackBase = "https://web.archive.org/save/";
+                const retryDelays = [1000, 3000, 7000];
+
+                const attemptSave = async (attempt) => {
+                    try {
+                        await fetch(`${waybackBase}${item.url}`, { mode: 'no-cors' });
+                        item.archiveUrl = `https://web.archive.org/web/${item.url}`;
+                        item.status = 'success';
+                        this.save();
+                    } catch (err) {
+                        if (attempt < retryDelays.length) {
+                            setTimeout(() => attemptSave(attempt + 1), retryDelays[attempt]);
+                        } else {
+                            item.status = 'error';
+                            this.save();
+                        }
+                    }
+                };
+                attemptSave(0);
+            }
+
+            updateTitle(id, newTitle) {
+                const item = this.history.find(i => i.id === id);
+                if (item && newTitle !== undefined) {
+                    item.title = newTitle.trim() || this.formatUrlAsTitle(item.url);
+                    this.save();
+                }
+            }
+
+            deleteItem(id) {
+                this.history = this.history.filter(i => i.id !== id);
+                this.save();
+            }
+
+            clearHistory() {
+                if (confirm("Clear session?")) { this.history = []; this.save(); }
+            }
+
+            notify(msg) {
+                const toast = document.getElementById('toast');
+                toast.innerText = msg;
+                toast.classList.add('visible');
+                setTimeout(() => toast.classList.remove('visible'), 2500);
+            }
+
+            copyArchive(id) {
+                const item = this.history.find(i => i.id === id);
+                if (!item || !item.archiveUrl) return;
+                
+                const text = `Archived: (${item.title})[${item.archiveUrl}]`;
+                const html = `Archived: <a href="${item.archiveUrl}">${item.title}</a>`;
+                this.performCopy(text, html);
+            }
+
+            copyCombined(id) {
+                const item = this.history.find(i => i.id === id);
+                if (!item || !item.archiveUrl) return;
+                
+                const text = `Source: (${item.title})[${item.url}]\nArchived: (${item.title})[${item.archiveUrl}]`;
+                const html = `Source: <a href="${item.url}">${item.title}</a><br>Archived: <a href="${item.archiveUrl}">${item.title}</a>`;
+                this.performCopy(text, html);
+            }
+
+            performCopy(text, html) {
+                try {
+                    const listener = (e) => {
+                        e.clipboardData.setData('text/html', html);
+                        e.clipboardData.setData('text/plain', text);
+                        e.preventDefault();
+                    };
+                    document.addEventListener('copy', listener);
+                    document.execCommand('copy');
+                    document.removeEventListener('copy', listener);
+                    this.notify("Copied to clipboard!");
+                } catch (err) {
+                    navigator.clipboard.writeText(text);
+                    this.notify("Copied plain text!");
+                }
+            }
+
+            exportData() {
+                const now = new Date();
+                const ts = now.toISOString().split('T')[0] + '-' + now.getHours().toString().padStart(2, '0') + now.getMinutes().toString().padStart(2, '0');
+                const blob = new Blob([JSON.stringify(this.history, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `source-archive-${ts}.json`;
+                a.click();
+            }
+
+            importData(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        let added = 0;
+                        data.forEach(item => {
+                            if (!this.history.find(h => h.url === item.url)) {
+                                this.history.push(item);
+                                added++;
+                            }
+                        });
+                        this.history.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                        this.save();
+                        this.notify(`Imported ${added} sources`);
+                    } catch (err) { this.notify("Invalid file format"); }
+                };
+                reader.readAsText(file);
+            }
+
+            render() {
+                const list = document.getElementById('history-list');
+                const empty = document.getElementById('empty-state');
+                const stats = document.getElementById('stats-text');
+
+                stats.innerText = `${this.history.length} source${this.history.length === 1 ? '' : 's'} secured`;
+                if (this.history.length === 0) {
+                    list.innerHTML = '';
+                    empty.classList.remove('hidden');
+                    return;
+                }
+                empty.classList.add('hidden');
+
+                list.innerHTML = this.history.map(item => {
+                    const isSuccess = item.status === 'success';
+                    const archiveUrlPreview = item.archiveUrl ? item.archiveUrl : '#';
+                    const displayTitle = item.title;
+                    
+                    return `
+                        <div class="source-card">
+                            <div class="card-header">
+                                <div class="card-info">
+                                    <div 
+                                        class="editable-title" 
+                                        contenteditable="true" 
+                                        onblur="app.updateTitle('${item.id}', this.innerText)"
+                                        title="Click to rename"
+                                    >${item.title}</div>
+                                    <div class="card-meta">
+                                        <img src="https://www.google.com/s2/favicons?domain=${item.domain}" alt="">
+                                        <span>${item.domain}</span>
+                                        <span>•</span>
+                                        <span>${new Date(item.timestamp).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                                <div class="status-badge status-${item.status}">
+                                    ${item.status === 'archiving' ? '<div class="spinner"></div>' : ''}
+                                    ${item.status}
+                                </div>
+                            </div>
+                            
+                            <div class="copy-boxes-stack">
+                                <!-- Box 1: Archive Link -->
+                                <div class="copy-box">
+                                    <div class="copy-box-text">
+                                        <div class="copy-row">
+                                            <b>Archived:</b> 
+                                            <a href="${archiveUrlPreview}" target="_blank" rel="noopener noreferrer" class="link-preview">
+                                                ${displayTitle}
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        class="copy-box-btn" 
+                                        onclick="app.copyArchive('${item.id}')"
+                                        ${!isSuccess ? 'disabled' : ''}
+                                        title="Copy Archive Hyperlink"
+                                    >
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Box 2: Combined Source -->
+                                <div class="copy-box">
+                                    <div class="copy-box-text">
+                                        <div class="copy-row">
+                                            <b>Source:</b> 
+                                            <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="link-preview">
+                                                ${displayTitle}
+                                            </a>
+                                        </div>
+                                        <div class="copy-row">
+                                            <b>Archived:</b> 
+                                            <a href="${archiveUrlPreview}" target="_blank" rel="noopener noreferrer" class="link-preview">
+                                                ${displayTitle}
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        class="copy-box-btn" 
+                                        onclick="app.copyCombined('${item.id}')"
+                                        ${!isSuccess ? 'disabled' : ''}
+                                        title="Copy Combined Hyperlinks"
+                                    >
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="card-footer">
+                                <a href="${item.url}" target="_blank" class="btn btn-sm" style="color: #666; border: none; background: transparent; padding-left: 0;">
+                                    <i class="fa-solid fa-globe"></i> View Original
+                                </a>
+                                <div class="action-group" style="display: flex; gap: 8px;">
+                                    ${isSuccess ? `
+                                        <a href="${item.archiveUrl}" target="_blank" class="btn btn-sm" style="color: var(--accent-color); border-color: rgba(74,144,226,0.2);">
+                                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Archive
+                                        </a>
+                                    ` : ''}
+                                    <button class="btn btn-sm" style="color: #555; border: none; background: transparent;" onclick="app.deleteItem('${item.id}')" title="Delete entry">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        const app = new SourceArchive();
+    </script>
+</body>
+</html>
