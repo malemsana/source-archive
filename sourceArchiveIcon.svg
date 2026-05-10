@@ -1,0 +1,8 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#4a90e2">
+    <!-- The absence of a background rect ensures transparency -->
+    <rect x="25" y="45" width="10" height="40" rx="2" />
+    <rect x="45" y="45" width="10" height="40" rx="2" />
+    <rect x="65" y="45" width="10" height="40" rx="2" />
+    <path d="M20 40 L50 15 L80 40 Z" />
+    <rect x="15" y="85" width="70" height="5" rx="1" />
+</svg>
